@@ -51,6 +51,51 @@ pipeline {
                 
             }
         }
+
+        stage("Запуск") {
+            steps {
+                timestamps {
+                    script {
+
+                            testbase = "${templatebase}"
+                            testbaseConnString ="/F${local}\\${infobase}"
+
+                            createDbTasks["createTask_${testbase}"] = createDbTask (
+                                testbase,
+                                local,
+                                deleteornot
+                            )
+
+                    }
+                }
+
+
+
         
     }
+}
+
+
+def createDbTask(infobase, local, deleteornot) {
+    return {
+        stage("Удаление старой и создание новой 1с базы ${infobase}") {
+            timestamps {
+                if (deleteornot != null && !deleteornot.isEmpty() && deleteornot =="нет"){
+
+    
+                }   
+    
+                else if (deleteornot == "да") {
+                    utils = new Utils()
+
+                    utils.powershell("Remove-Item -Recurse -Force -Path \"${local}/${infobase}\" ")
+
+                    utils.cmd("\"${path1c}\" CREATEINFOBASE FILE=\"${local}/${infobase}\" ")
+                }
+                     
+
+            }
+        }
+    }
+
 }
