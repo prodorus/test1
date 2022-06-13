@@ -1,3 +1,4 @@
+@shared-libraries
 import io.libs.Utils
 def utils = new Utils()
 
