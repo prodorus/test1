@@ -1,3 +1,7 @@
+import io.libs.Utils
+def utils = new Utils()
+
+
 pipeline {
     
     // Входные параметры для запуска сборки
@@ -72,7 +76,10 @@ pipeline {
 
 
         
+            }
+        }
     }
+
 }
 
 
@@ -99,3 +106,4 @@ def createDbTask(infobase, local, deleteornot) {
     }
 
 }
+
