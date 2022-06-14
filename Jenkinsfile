@@ -65,7 +65,7 @@ pipeline {
                             testbase = "${templatebase}"
                             testbaseConnString ="/F${local}\\${testbase}"
 
-                            createDbTasks["createTask_${testbase}"] = createDbTask (
+                            createDbTask["createTask_${testbase}"] = createDbTask (
                                 testbase,
                                 local,
                                 deleteornot
