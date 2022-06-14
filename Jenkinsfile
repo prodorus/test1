@@ -63,12 +63,12 @@ pipeline {
                             testbase = "${templatebase}"
                             testbaseConnString ="/F${local}\\${testbase}"
 
-                            createDbTask["createTask_${testbase}"] = createDbTask (
+                            createDbTask1["createTask_${testbase}"] = createDbTask (
                                 testbase,
                                 local,
                                 deleteornot
                             )
-                        parallel createDbTask
+                        parallel createDbTask1
                     }
                 }
 
