@@ -1,11 +1,20 @@
+@Library("shared-libraries")
 
+import io.libs.ProjectHelpers
 import io.libs.Utils
-def utils = new Utils()
+import jenkins.model.*
 
+
+
+def utils = new Utils()
+def projectHelpers = new ProjectHelpers()
+
+
+def createDbTasks = [:]
+def runSmoke1cTasks = [:]
+def updateDbTasks = [:]
 
 pipeline {
-    
-    // Входные параметры для запуска сборки
 
     parameters {
         string(defaultValue: "${env.jenkinsAgent}", description: 'Нода дженкинса, на которой запускать пайплайн. По умолчанию master', name: 'jenkinsAgent')
@@ -16,95 +25,177 @@ pipeline {
         string(defaultValue: "${env.admin1cUser}", description: 'Имя администратора с правом открытия вншних обработок (!) для базы тестирования 1с ', name: 'admin1cUser')
         string(defaultValue: "${env.admin1cPwd}", description: 'Пароль администратора базы тестирования 1C. ', name: 'admin1cPwd')
         string(defaultValue: "${env.templatebase}", description: 'Название базы данных для создания', name: 'templatebase')
-        string(defaultValue: "${env.gitpath}", description: 'Путь к конфигурации базы данных GIT', name: 'gitpath')        
-
+        string(defaultValue: "${env.gitpath}", description: 'Путь к конфигурации базы данных GIT', name: 'gitpath')
     }
-    
-    
-    
-    // нода дженкинса (если не задана в параметрах, то "master")
-    
+
     agent {
-        label "${(env.jenkinsAgent == null || env.jenkinsAgent == 'null') ? "master" : env.jenkinsAgent}"   
+        label "${(env.jenkinsAgent == null || env.jenkinsAgent == 'null') ? "master" : env.jenkinsAgent}"
     }
-
-    // Что может означать, скорее всего время на тест
     options {
         timeout(time: 8, unit: 'HOURS') 
         buildDiscarder(logRotator(numToKeepStr:'10'))
     }
-
-
     stages {
-        
-        // 1 Стадия
-        stage('Подготовка') {
+        stage("Подготовка") {
             steps {
                 timestamps {
                     script {
+                        
                     
-                    testbase = null
+                        testbase = null
 
-                    dir('build') {
-                        writeFile file:'dummy', text:''
+                        // создаем пустые каталоги
+                        dir ('build') {
+                            writeFile file:'dummy', text:''
+                        }
                     }
-
-                    }
-
-
                 }
-                
             }
         }
-
         stage("Запуск") {
             steps {
                 timestamps {
                     script {
 
+                        
+    
                             testbase = "${templatebase}"
-                            testbaseConnString ="/F${local}\\${infobase}"
+                            
+                            testbaseConnString = projectHelpers.getConnString1(local,testbase)
+                            
+                            backupPath = "${env.WORKSPACE}/build/temp_${templatebase}_${utils.currentDateStamp()}"
+                           
+                            // 1.  Создание новой 1с базы
 
                             createDbTasks["createTask_${testbase}"] = createDbTask (
                                 testbase,
                                 local,
                                 deleteornot
                             )
+                            
+                            
+                            // 2. Обновляем тестовую базу из git
+                            updateDbTasks["updateTask_${testbase}"] = updateDbTask(
+                                platform1c,
+                                testbase, 
+                                testbaseConnString, 
+                                admin1cUser, 
+                                admin1cPwd,
+                                gitpath,
+                                path1c
+                            )
 
+                            // 3. Запускаем внешнюю обработку 1С, которая очищает базу от всплывающего окна с тем, что база перемещена при старте 1С
+                            runSmoke1cTasks["runSmoke1cTask_${testbase}"] = runSmoke1cTask(
+                                testbase,
+                                admin1cUser,
+                                admin1cPwd,
+                                testbaseConnString
+                            )
+                            
+                        
+
+                        parallel createDbTasks
+                        parallel updateDbTasks
+                        parallel runSmoke1cTasks
+                        
                     }
                 }
+            }
+        }
 
+        stage("Проведение дымовых тестов") {
+            steps {
+                timestamps {
+                    script {
 
+                        if (templatebase == "") {
+                            return
+                        }
 
-        
+                        platform1cLine = ""
+                        if (platform1c != null && !platform1c.isEmpty()) {
+                            platform1cLine = "--v8version ${platform1c}"
+                        }
+
+                        admin1cUsrLine = ""
+                        if (admin1cUser != null && !admin1cUser.isEmpty()) {
+                            admin1cUsrLine = "--db-user ${admin1cUser}"
+                        }
+
+                        admin1cPwdLine = ""
+                        if (admin1cPwd != null && !admin1cPwd.isEmpty()) {
+                            admin1cPwdLine = "--db-pwd ${admin1cPwd}"
+                        }
+                        // Запускаем ADD тестирование на произвольной базе, сохранившейся в переменной testbaseConnString
+                        returnCode = utils.cmd("vrunner xunit --settings tools/vrunner.json ${platform1cLine} --ibconnection \"${testbaseConnString}\" ${admin1cUsrLine} ${admin1cPwdLine} ")
+                        
+                        if (returnCode != 0) {
+                            utils.raiseError("Возникла ошибка при запуске ADD на  базе ${testbase}")
+                        }
+                    }
+                }
+            }
+        }
+    }   
+    post {
+        always {
+            script {
+                if (currentBuild.result == "ABORTED") {
+                    return
+                }
+
+                dir ('build/out/allure') {
+                    writeFile file:'environment.properties', text:"Build=${env.BUILD_URL}"
+                }
+
+                allure includeProperties: false, jdk: '', results: [[path: 'build/out']]
             }
         }
     }
 
+  
 }
-
-
 def createDbTask(infobase, local, deleteornot) {
     return {
         stage("Удаление старой и создание новой 1с базы ${infobase}") {
             timestamps {
-                if (deleteornot != null && !deleteornot.isEmpty() && deleteornot =="нет"){
-
-    
-                }   
-    
-                else if (deleteornot == "да") {
-                    utils = new Utils()
-
-                    utils.powershell("Remove-Item -Recurse -Force -Path \"${local}/${infobase}\" ")
-
-                    utils.cmd("\"${path1c}\" CREATEINFOBASE FILE=\"${local}/${infobase}\" ")
-                }
-                     
-
+                def projectHelpers = new ProjectHelpers()
+                projectHelpers.creating1cBase(infobase,local,deleteornot)
             }
+
         }
+        
     }
 
 }
 
+    
+
+
+def runSmoke1cTask(infobase, admin1cUser, admin1cPwd, testbaseConnString) {
+    return {
+        stage("Запуск 1с обработки на ${infobase}") {
+            timestamps {
+                def projectHelpers = new ProjectHelpers()
+                projectHelpers.unlocking1cBase(testbaseConnString, admin1cUser, admin1cPwd)
+            }
+
+        }
+        
+    }
+
+}
+
+def updateDbTask(platform1c, infobase, connString, admin1cUser, admin1cPwd, gitpath, path1c) {
+    return {
+        stage("Загрузка конфигурации из GIT и ее обновление ${infobase}") {
+            timestamps {
+                prHelpers = new ProjectHelpers()
+
+                prHelpers.loadCfgFrom1CStorage(infobase, admin1cUser, admin1cPwd, platform1c, gitpath, path1c)
+                prHelpers.updateInfobase(connString, admin1cUser, admin1cPwd, platform1c)
+            }
+        }
+    }
+}
