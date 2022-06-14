@@ -63,7 +63,7 @@ pipeline {
                     script {
 
                             testbase = "${templatebase}"
-                            testbaseConnString ="/F${local}\\${infobase}"
+                            testbaseConnString ="/F${local}\\${testbase}"
 
                             createDbTasks["createTask_${testbase}"] = createDbTask (
                                 testbase,
