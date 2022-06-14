@@ -70,7 +70,7 @@ pipeline {
                                 local,
                                 deleteornot
                             )
-                        parallel createDbTask
+                    parallel createDbTask
                     }
                 }
 
