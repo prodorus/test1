@@ -2,6 +2,7 @@
 import Utils
 def utils = new Utils()
 
+def createDbTask = [:]
 
 pipeline {
     
