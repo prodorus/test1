@@ -90,22 +90,11 @@ def createDbTask(infobase, local, deleteornot) {
     return {
         stage("Удаление старой и создание новой 1с базы ${infobase}") {
             timestamps {
-                if (deleteornot != null && !deleteornot.isEmpty() && deleteornot =="нет"){
-
-    
-                }   
-    
-                else if (deleteornot == "да") {
-                    utils = new Utils()
-
-                    utils.powershell("Remove-Item -Recurse -Force -Path \"${local}/${infobase}\" ")
-
-                    utils.cmd("\"${path1c}\" CREATEINFOBASE FILE=\"${local}/${infobase}\" ")
-                }
-                     
-
+                
             }
+
         }
+        
     }
 
 }
