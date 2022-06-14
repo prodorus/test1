@@ -30,10 +30,7 @@ pipeline {
     }
 
     // Что может означать, скорее всего время на тест
-    options {
-        timeout(time: 8, unit: 'HOURS') 
-        buildDiscarder(logRotator(numToKeepStr:'10'))
-    }
+    
 
 
     stages {
@@ -64,14 +61,14 @@ pipeline {
                     script {
 
                             testbase = "${templatebase}"
-                            
+                            testbaseConnString ="/F${local}\\${testbase}"
 
                             createDbTask["createTask_${testbase}"] = createDbTask (
                                 testbase,
                                 local,
                                 deleteornot
                             )
-                        
+                        parallel createDbTask
                     }
                 }
 
