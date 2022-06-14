@@ -1,5 +1,5 @@
 @Library("shared-libraries")
-import io.libs.Utils
+import io.Utils
 def utils = new Utils()
 
 
