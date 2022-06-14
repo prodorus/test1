@@ -2,7 +2,7 @@
 import Utils
 def utils = new Utils()
 
-
+def createDbTask1 = [:]
 
 pipeline {
     
@@ -63,7 +63,7 @@ pipeline {
                             testbase = "${templatebase}"
                             testbaseConnString ="/F${local}\\${testbase}"
 
-                            createDbTask1 = createDbTask (
+                            createDbTask1["createTask_${testbase}"] = createDbTask (
                                 testbase,
                                 local,
                                 deleteornot
