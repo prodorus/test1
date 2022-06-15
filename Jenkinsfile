@@ -120,8 +120,8 @@ def updateDbTask(platform1c, infobase, connString, admin1cUser, admin1cPwd, gitp
                     utils.raiseError("Загрузка конфигурации из github  ${infobase} завершилась с ошибкой. ")
                 }
 
-                 if (admin1cPassword != null && !admin1cPassword.isEmpty()) {
-                    returnCode = utils.cmd("\"${path1c}\" DESIGNER /F${local}/${infobase}  /LoadConfigFromFiles ${env.WORKSPACE}\\confs\\${infobase} /N ${admin1cUser} /P ${admin1cPassword} ")
+                 if (admin1cPwd != null && !admin1cPwd.isEmpty()) {
+                    returnCode = utils.cmd("\"${path1c}\" DESIGNER /F${local}/${infobase}  /LoadConfigFromFiles ${env.WORKSPACE}\\confs\\${infobase} /N ${admin1cUser} /P ${admin1cPwd} ")
                     if (returnCode != 0) {
                         utils.raiseError("Загрузка конфигурации из папки \"${env.WORKSPACE}/confs завершилась с ошибкой.")}
                 
