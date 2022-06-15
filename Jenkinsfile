@@ -7,6 +7,7 @@ def projectHelpers = new ProjectHelpers()
 
 def createDbTask1 = [:]
 def updateDbTask1 = [:]
+
 pipeline {
     
     // Входные параметры для запуска сборки
