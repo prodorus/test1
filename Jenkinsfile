@@ -52,7 +52,7 @@ pipeline {
                                 local,
                                 deleteornot
                             )
-                            return ala
+                            parallel ala
                         
                     }
                 }
