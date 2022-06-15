@@ -3,7 +3,7 @@ import Utils
 def utils = new Utils()
 
 
-
+def createDbTask1 = [:]
 
 pipeline {
     
@@ -47,11 +47,12 @@ pipeline {
                             testbase = "${templatebase}"
                             testbaseConnString ="/F${local}\\${testbase}"
 
-                            createDbTask (
+                            createDbTask1["createTask_${testbase}"] = createDbTask (
                                 testbase,
                                 local,
-                                deleteornot)
-                        
+                                deleteornot
+                            )
+                        parallel createDbTask1
                     }
                 }
 
