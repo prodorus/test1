@@ -139,8 +139,8 @@ def updateDbTask(platform1c, infobase, connString, admin1cUser, admin1cPwd, gitp
                     admin1cUserLine = "--db-user ${admin1cUser}"
                 }
                 admin1cPassLine = "";
-                if (!admin1cPassword.isEmpty()) {
-                    admin1cPassLine = "--db-pwd ${admin1cPassword}"
+                if (!admin1cPwd.isEmpty()) {
+                    admin1cPassLine = "--db-pwd ${admin1cPwd}"
                 }
                 platformLine = ""
                 if (platform != null && !platform.isEmpty()) {
