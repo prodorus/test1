@@ -7,6 +7,7 @@ def projectHelpers = new ProjectHelpers()
 
 def createDbTask1 = [:]
 def updateDbTask1 = [:]
+def runSmoke1cTask1 = [:]
 
 pipeline {
     
@@ -64,11 +65,20 @@ pipeline {
                                 path1c
                             )
 
+                             // 3. Запускаем внешнюю обработку 1С, которая очищает базу от всплывающего окна с тем, что база перемещена при старте 1С
+                            runSmoke1cTask1["runSmoke1cTask_${testbase}"] = runSmoke1cTask(
+                                testbase,
+                                admin1cUser,
+                                admin1cPwd,
+                                testbaseConnString
+                            )
+
                             
 
                         parallel createDbTask1
                         parallel updateDbTask1
-                       
+                        parallel runSmoke1cTask1
+
                     }
                 }
 
@@ -114,4 +124,19 @@ def updateDbTask(platform1c, infobase, connString, admin1cUser, admin1cPwd, gitp
             }
         }
     }
+}
+
+
+def runSmoke1cTask(infobase, admin1cUser, admin1cPwd, testbaseConnString) {
+    return {
+        stage("Запуск 1с обработки на ${infobase}") {
+            timestamps {
+                def projectHelpers = new ProjectHelpers()
+                projectHelpers.unlocking1cBase(testbaseConnString, admin1cUser, admin1cPwd)
+            }
+
+        }
+        
+    }
+
 }
