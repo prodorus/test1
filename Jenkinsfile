@@ -47,11 +47,12 @@ pipeline {
                             testbase = "${templatebase}"
                             testbaseConnString ="/F${local}\\${testbase}"
 
-                            def createDbTask (
+                            ala = def createDbTask (
                                 testbase,
                                 local,
                                 deleteornot
                             )
+                            return ala
                         
                     }
                 }
