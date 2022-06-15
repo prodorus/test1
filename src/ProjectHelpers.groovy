@@ -1,4 +1,3 @@
-package io.libs
 
 def creating1cBase(infobase, local, deleteornot) {
     if (deleteornot != null && !deleteornot.isEmpty() && deleteornot =="нет"){
