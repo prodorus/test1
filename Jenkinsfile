@@ -143,8 +143,8 @@ def updateDbTask(platform1c, infobase, connString, admin1cUser, admin1cPwd, gitp
                     admin1cPassLine = "--db-pwd ${admin1cPwd}"
                 }
                 platformLine = ""
-                if (platform != null && !platform.isEmpty()) {
-                    platformLine = "--v8version ${platform}"
+                if (platform1c != null && !platform1c.isEmpty()) {
+                    platformLine = "--v8version ${platform1c}"
                 }
 
                 returnCode = utils.cmd("runner updatedb --ibconnection ${connString} ${admin1cUserLine} ${admin1cPassLine} ${platformLine}")
