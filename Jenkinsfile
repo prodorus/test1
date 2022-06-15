@@ -4,7 +4,7 @@ def utils = new Utils()
 
 
 def createDbTask1 = [:]
-
+def updateDbTask1 = [:]
 pipeline {
     
     // Входные параметры для запуска сборки
@@ -35,20 +35,37 @@ pipeline {
 
 
     stages {
-        stage("Запуск") {
+        stage("Обновление конфигурации и запуск ИБ 1С") {
             steps {
                 timestamps {
                     script {
 
                             testbase = "${templatebase}"
                             testbaseConnString ="/F${local}\\${testbase}"
-
+                            
+                            // 1.  Создание новой 1с базы
                             createDbTask1["createTask_${testbase}"] = createDbTask (
                                 testbase,
                                 local,
                                 deleteornot
                             )
+
+                            // 2. Обновляем тестовую базу из git
+                            updateDbTask1["updateTask_${testbase}"] = updateDbTask(
+                                platform1c,
+                                testbase, 
+                                testbaseConnString, 
+                                admin1cUser, 
+                                admin1cPwd,
+                                gitpath,
+                                path1c
+                            )
+
+                            
+
                         parallel createDbTask1
+                        parallel updateDbTask1
+                       
                     }
                 }
 
@@ -86,4 +103,38 @@ def createDbTask(infobase, local, deleteornot) {
         }
     }
 
+}
+
+
+def updateDbTask(platform1c, infobase, connString, admin1cUser, admin1cPwd, gitpath, path1c) {
+    return {
+        stage("Загрузка конфигурации из GIT и ее обновление ${infobase}") {
+            timestamps {
+                utils = new Utils()
+
+                returnCode = utils.cmd("rd /s/q \"${env.WORKSPACE}/confs/${infobase}")
+
+
+                returnCode = utils.cmd("git clone ${gitpath} \"${env.WORKSPACE}/confs/${infobase}")
+                if (returnCode != 0) {
+                    utils.raiseError("Загрузка конфигурации из github  ${infobase} завершилась с ошибкой. ")
+                }
+
+                 if (admin1cPassword != null && !admin1cPassword.isEmpty()) {
+                    returnCode = utils.cmd("\"${path1c}\" DESIGNER /F${local}/${infobase}  /LoadConfigFromFiles ${env.WORKSPACE}\\confs\\${infobase} /N ${admin1cUser} /P ${admin1cPassword} ")
+                    if (returnCode != 0) {
+                        utils.raiseError("Загрузка конфигурации из папки \"${env.WORKSPACE}/confs завершилась с ошибкой.")}
+                
+                } else {
+                    returnCode = utils.cmd("\"${path1c}\" DESIGNER /F${local}/${infobase}  /LoadConfigFromFiles ${env.WORKSPACE}\\confs\\${infobase} /N ${admin1cUser}")
+                    if (returnCode != 0) {
+                    utils.raiseError("Загрузка конфигурации из папки \"${env.WORKSPACE}/confs завершилась с ошибкой.")
+                }
+
+                }
+
+                
+            }
+        }
+    }
 }
