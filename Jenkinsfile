@@ -81,6 +81,7 @@ def createDbTask(infobase, local, deleteornot) {
 
                     utils.powershell("Remove-Item -Recurse -Force -Path \"${local}/${infobase}\" ")
 
+                    utils.cmd("\"${path1c}\" CREATEINFOBASE FILE=\"${local}/${infobase}\" ")
                    
                 }
                      
