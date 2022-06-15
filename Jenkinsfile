@@ -84,19 +84,9 @@ def createDbTask(infobase, local, deleteornot) {
     return {
         stage("Удаление старой и создание новой 1с базы ${infobase}") {
             timestamps {
-                if (deleteornot != null && !deleteornot.isEmpty() && deleteornot =="нет"){
-
-    
-                }   
-    
-                else if (deleteornot == "да") {
-                    utils = new Utils()
-
-                    utils.powershell("Remove-Item -Recurse -Force -Path \"${local}/${infobase}\" ")
-
-                    utils.cmd("\"${path1c}\" CREATEINFOBASE FILE=\"${local}/${infobase}\" ")
-                   
-                }
+                def projectHelpers = new ProjectHelpers()
+                projectHelpers.unlocking1cBase(testbaseConnString, admin1cUser, admin1cPwd)  
+                
                      
 
             }
@@ -110,47 +100,11 @@ def updateDbTask(platform1c, infobase, connString, admin1cUser, admin1cPwd, gitp
     return {
         stage("Загрузка конфигурации из GIT и ее обновление ${infobase}") {
             timestamps {
-                utils = new Utils()
+                prHelpers = new ProjectHelpers()
 
-                returnCode = utils.cmd("rd /s/q \"${env.WORKSPACE}/confs/${infobase}")
-
-
-                returnCode = utils.cmd("git clone ${gitpath} \"${env.WORKSPACE}/confs/${infobase}")
-                if (returnCode != 0) {
-                    utils.raiseError("Загрузка конфигурации из github  ${infobase} завершилась с ошибкой. ")
-                }
-
-                 if (admin1cPwd != null && !admin1cPwd.isEmpty()) {
-                    returnCode = utils.cmd("\"${path1c}\" DESIGNER /F${local}/${infobase}  /LoadConfigFromFiles ${env.WORKSPACE}\\confs\\${infobase} /N ${admin1cUser} /P ${admin1cPwd} ")
-                    if (returnCode != 0) {
-                        utils.raiseError("Загрузка конфигурации из папки \"${env.WORKSPACE}/confs завершилась с ошибкой.")}
+                prHelpers.loadCfgFrom1CStorage(infobase, admin1cUser, admin1cPwd, platform1c, gitpath, path1c)
+                prHelpers.updateInfobase(connString, admin1cUser, admin1cPwd, platform1c)
                 
-                } else {
-                    returnCode = utils.cmd("\"${path1c}\" DESIGNER /F${local}/${infobase}  /LoadConfigFromFiles ${env.WORKSPACE}\\confs\\${infobase} /N ${admin1cUser}")
-                    if (returnCode != 0) {
-                    utils.raiseError("Загрузка конфигурации из папки \"${env.WORKSPACE}/confs завершилась с ошибкой.")
-                }
-
-                }
-
-                utils = new Utils()
-                admin1cUserLine = "";
-                if (!admin1cUser.isEmpty()) {
-                    admin1cUserLine = "--db-user ${admin1cUser}"
-                }
-                admin1cPassLine = "";
-                if (!admin1cPwd.isEmpty()) {
-                    admin1cPassLine = "--db-pwd ${admin1cPwd}"
-                }
-                platformLine = ""
-                if (platform1c != null && !platform1c.isEmpty()) {
-                    platformLine = "--v8version ${platform1c}"
-                }
-
-                returnCode = utils.cmd("runner updatedb --ibconnection ${connString} ${admin1cUserLine} ${admin1cPassLine} ${platformLine}")
-                if (returnCode != 0) {
-                    utils.raiseError("Обновление базы ${connString} в режиме конфигуратора завершилось с ошибкой. Для дополнительной информации смотрите логи")
-                }
 
 
                 
