@@ -1,7 +1,9 @@
 @Library("shared-libraries")
 import Utils
-def utils = new Utils()
+import ProjectHelpers
 
+def utils = new Utils()
+def projectHelpers = new ProjectHelpers()
 
 def createDbTask1 = [:]
 def updateDbTask1 = [:]
