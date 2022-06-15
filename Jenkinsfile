@@ -36,24 +36,7 @@ pipeline {
     stages {
         
         // 1 Стадия
-        stage('Подготовка') {
-            steps {
-                timestamps {
-                    script {
-                    
-                    testbase = null
-
-                    dir('build') {
-                        writeFile file:'dummy', text:''
-                    }
-
-                    }
-
-
-                }
-                
-            }
-        }
+        
 
         stage("Запуск") {
             steps {
