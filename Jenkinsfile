@@ -34,6 +34,11 @@ pipeline {
         label "${(env.jenkinsAgent == null || env.jenkinsAgent == 'null') ? "master" : env.jenkinsAgent}"   
     }
 
+    options {
+        timeout(time: 1, unit: 'MINUTES') 
+        buildDiscarder(logRotator(numToKeepStr:'10'))
+    }
+
     // Что может означать, скорее всего время на тест
     
 
