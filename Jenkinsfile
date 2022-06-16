@@ -72,8 +72,7 @@ pipeline {
                                 testbaseConnString
                             )
                         
-                        parallel updateDbTask1
-                        parallel runSmoke1cTask1
+                        
 
                     }
                 }
