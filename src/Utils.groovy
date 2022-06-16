@@ -39,6 +39,18 @@ def raiseError(errorText) {
     utils.setBuildResultMessage(errorText)
     error errorText
 }
+
+// Создает и прикрепляет артефакт к сборке в виде текстового файла. Каждый вызов метода перезатирает артефакт.
+//
+// Параметры:
+//  text - текст для помещения в артефакт
+//
+def setBuildResultMessage(text){
+    def fileName = 'BuildResultMessage.txt'
+    writeFile(file: fileName, text: text, encoding: "UTF-8")
+    step([$class: 'ArtifactArchiver', artifacts: fileName, fingerprint: true])
+}
+
 '''
 
 // Выполняет команду в среде ОС Windows (batch) или Linux (bash) и возвращает вывод
@@ -223,16 +235,7 @@ def giveMeKey(len = 8) {
     return randomString
 }
 
-// Создает и прикрепляет артефакт к сборке в виде текстового файла. Каждый вызов метода перезатирает артефакт.
-//
-// Параметры:
-//  text - текст для помещения в артефакт
-//
-def setBuildResultMessage(text){
-    def fileName = 'BuildResultMessage.txt'
-    writeFile(file: fileName, text: text, encoding: "UTF-8")
-    step([$class: 'ArtifactArchiver', artifacts: fileName, fingerprint: true])
-}
+
 
 // Блокирует поток выполнения кода на переданное число секунд. Работает только под Windows
 //
