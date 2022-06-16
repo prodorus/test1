@@ -28,6 +28,19 @@ def cmd(command, workDir = "") {
     return returnCode
 }
 
+// Вызывает ошибку, которая прекращает исполнение кода и прикрепляет текст ошибки архивом к сборке
+//
+// Параметры:
+//
+//  errorText - читаемое описание ошибки
+//
+def raiseError(errorText) {
+    utils = new Utils()
+    utils.setBuildResultMessage(errorText)
+    error errorText
+}
+'''
+
 // Выполняет команду в среде ОС Windows (batch) или Linux (bash) и возвращает вывод
 //
 // Параметры:
@@ -244,17 +257,7 @@ def copyFile(sourceFile, destFile) {
     cmd("oscript one_script_tools/copyFile.os -sourcefile ${sourceFile} -destfile ${destFile}")
 }
 
-// Вызывает ошибку, которая прекращает исполнение кода и прикрепляет текст ошибки архивом к сборке
-//
-// Параметры:
-//
-//  errorText - читаемое описание ошибки
-//
-def raiseError(errorText) {
-    utils = new Utils()
-    utils.setBuildResultMessage(errorText)
-    error errorText
-}
+
 
 // Возвращает команду консоли для выполнения батника в указанном каталоге.
 // Пример использования: utils.cmd("${getWorkspaceLine(workspace)} git init")
@@ -307,4 +310,4 @@ def lineToArray(line, splitter = ",") {
         }
     }
     return cleanArray
-}
+}'''
