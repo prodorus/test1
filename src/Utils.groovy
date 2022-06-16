@@ -27,7 +27,7 @@ def cmd(command, workDir = "") {
     }
     return returnCode
 }
-
+'''
 // Вызывает ошибку, которая прекращает исполнение кода и прикрепляет текст ошибки архивом к сборке
 //
 // Параметры:
@@ -39,7 +39,7 @@ def raiseError(errorText) {
     utils.setBuildResultMessage(errorText)
     error errorText
 }
-'''
+
 
 // Выполняет команду в среде ОС Windows (batch) или Linux (bash) и возвращает вывод
 //
