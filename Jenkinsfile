@@ -113,7 +113,7 @@ pipeline {
                             admin1cPwdLine = "--db-pwd ${admin1cPwd}"
                         }
                         // Запускаем ADD тестирование на произвольной базе, сохранившейся в переменной testbaseConnString
-                        returnCode = utils.cmd("vrunner xunit --settings tools/vrunner.json ${platform1cLine} + 
+                        returnCode = utils.cmd("vrunner xunit --settings tools/vrunner.json ${platform1cLine}  \
                             --ibconnection \"${testbaseConnString}\" ${admin1cUsrLine} ${admin1cPwdLine} ")
                         
                         if (returnCode != 0) {
