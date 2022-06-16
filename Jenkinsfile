@@ -4,9 +4,10 @@ import ProjectHelpers
 
 def utils = new Utils()
 def projectHelpers = new ProjectHelpers()
-def createdbTask = new createDbTask()
-def updatedbTask = new updateDbTask()
-def runsmoke1cTask = new runSmoke1cTask()
+
+def createDbTask1 = [:]
+def updateDbTask1 = [:]
+def runSmoke1cTask1 = [:]
 
 pipeline {
     
@@ -46,14 +47,14 @@ pipeline {
                             testbaseConnString ="/F${local}\\${testbase}"
                             
                             // 1.  Создание новой 1с базы
-                            parallel createdbTask (
+                            createDbTask1["createTask_${testbase}"] = createDbTask (
                                 testbase,
                                 local,
                                 deleteornot
                             )
 
                             // 2. Обновляем тестовую базу из git
-                            parallel updatedbTask(
+                            updateDbTask1["updateTask_${testbase}"] = updateDbTask(
                                 platform1c,
                                 testbase, 
                                 testbaseConnString, 
@@ -64,13 +65,15 @@ pipeline {
                             )
 
                              // 3. Запускаем внешнюю обработку 1С, которая очищает базу от всплывающего окна с тем, что база перемещена при старте 1С
-                            parallel runsmoke1cTask(
+                            runSmoke1cTask1["runSmoke1cTask_${testbase}"] = runSmoke1cTask(
                                 testbase,
                                 admin1cUser,
                                 admin1cPwd,
                                 testbaseConnString
                             )
-                        
+                        parallel createDbTask1
+                        parallel updateDbTask1
+                        parallel runSmoke1cTask1
 
                     }
                 }
