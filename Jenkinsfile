@@ -35,11 +35,10 @@ pipeline {
     }
 
     options {
-        timeout(time: 1, unit: 'MINUTES') 
+        timeout(time: 1, unit: 'HOURS') 
         buildDiscarder(logRotator(numToKeepStr:'10'))
     }
 
-    // Что может означать, скорее всего время на тест
     
 
 
