@@ -5,9 +5,7 @@ import ProjectHelpers
 def utils = new Utils()
 def projectHelpers = new ProjectHelpers()
 
-def createDbTask1 
-def updateDbTask1 
-def runSmoke1cTask1 
+
 
 pipeline {
     
