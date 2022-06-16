@@ -20,7 +20,7 @@
         "--db-user": "Admin",
         "--db-pwd": "",
         "--xddConfig": "./tools/JSON/xUnitParams.json",
-        "testsPath": "./tests",
+        "testsPath": "./smoke",
         "--reportsxunit": "ГенераторОтчетаJUnitXML{build/junit.xml};ГенераторОтчетаAllureXMLВерсия2{build/allure/allure.xml}",
         "--xddExitCodePath": "./build/xddExitCodePath.txt",
         "--pathxunit": "./tools/add/xddTestRunner.epf"
