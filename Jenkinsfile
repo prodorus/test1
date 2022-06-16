@@ -25,9 +25,7 @@ pipeline {
         string(defaultValue: "${env.gitpath}", description: 'Путь к конфигурации базы данных GIT', name: 'gitpath')        
 
     }
-    
-    
-    
+       
     // нода дженкинса (если не задана в параметрах, то "master")
     
     agent {
@@ -38,9 +36,6 @@ pipeline {
         timeout(time: 1, unit: 'HOURS') 
         buildDiscarder(logRotator(numToKeepStr:'10'))
     }
-
-    
-
 
     stages {
         stage("Обновление конфигурации и запуск ИБ 1С") {
@@ -76,22 +71,15 @@ pipeline {
                                 admin1cPwd,
                                 testbaseConnString
                             )
-
-                            
-
-                        parallel createDbTask1
+                        
                         parallel updateDbTask1
                         parallel runSmoke1cTask1
 
                     }
                 }
 
-
-
-
             }
         }
-
 
         stage("Проведение дымовых тестов") {
             steps {
@@ -146,8 +134,6 @@ pipeline {
     }
 
 }
-
-
 
 def createDbTask(infobase, local, deleteornot) {
     return {
