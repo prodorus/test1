@@ -45,7 +45,7 @@ pipeline {
                             testbaseConnString ="/F${local}\\${testbase}"
                             
                             class Person{
-                        	    testbase,
+                        	    String testbase,
                                 local,
                                 deleteornot
                             }
