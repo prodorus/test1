@@ -5,7 +5,9 @@ import ProjectHelpers
 def utils = new Utils()
 def projectHelpers = new ProjectHelpers()
 
-
+def createDbTask1 = [:]
+def updateDbTask1 = [:]
+def runSmoke1cTask1 = [:]
 
 pipeline {
     
@@ -44,14 +46,34 @@ pipeline {
                             testbase = "${templatebase}"
                             testbaseConnString ="/F${local}\\${testbase}"
                             
-                            
-
-                            // 1.  Создание новой 1с базЫ
-                            createDbTask (
-                                Person
+                            // 1.  Создание новой 1с базы
+                            createDbTask1["createTask_${testbase}"] = createDbTask (
+                                testbase,
+                                local,
+                                deleteornot
                             )
 
-                         parallel createDbTask   
+                            // 2. Обновляем тестовую базу из git
+                            updateDbTask1["updateTask_${testbase}"] = updateDbTask(
+                                platform1c,
+                                testbase, 
+                                testbaseConnString, 
+                                admin1cUser, 
+                                admin1cPwd,
+                                gitpath,
+                                path1c
+                            )
+
+                             // 3. Запускаем внешнюю обработку 1С, которая очищает базу от всплывающего окна с тем, что база перемещена при старте 1С
+                            runSmoke1cTask1["runSmoke1cTask_${testbase}"] = runSmoke1cTask(
+                                testbase,
+                                admin1cUser,
+                                admin1cPwd,
+                                testbaseConnString
+                            )
+                        parallel createDbTask1
+                        parallel updateDbTask1
+                        parallel runSmoke1cTask1
 
                     }
                 }
@@ -112,14 +134,6 @@ pipeline {
     }
 
 }
-
-class Person{
-    String testbase,
-    local,
-    deleteornot
-}
-
-
 
 def createDbTask(infobase, local, deleteornot) {
     return {
