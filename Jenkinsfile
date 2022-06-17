@@ -44,34 +44,18 @@ pipeline {
                             testbase = "${templatebase}"
                             testbaseConnString ="/F${local}\\${testbase}"
                             
-                            // 1.  Создание новой 1с базы
-                            def createDbTask1 = new createDbTask (
-                                testbase,
+                            class Person{
+                        	    testbase,
                                 local,
                                 deleteornot
+                            }
+
+                            // 1.  Создание новой 1с базЫ
+                            createDbTask (
+                                Person
                             )
 
-                            // 2. Обновляем тестовую базу из git
-                            def updateDbTask1 = new updateDbTask(
-                                platform1c,
-                                testbase, 
-                                testbaseConnString, 
-                                admin1cUser, 
-                                admin1cPwd,
-                                gitpath,
-                                path1c
-                            )
-
-                             // 3. Запускаем внешнюю обработку 1С, которая очищает базу от всплывающего окна с тем, что база перемещена при старте 1С
-                            def runSmoke1cTask1 = new runSmoke1cTask(
-                                testbase,
-                                admin1cUser,
-                                admin1cPwd,
-                                testbaseConnString
-                            )
-                        parallel createDbTask1
-                        parallel updateDbTask1
-                        parallel runSmoke1cTask1
+                            
 
                     }
                 }
