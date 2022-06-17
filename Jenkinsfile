@@ -69,7 +69,9 @@ pipeline {
                                 admin1cPwd,
                                 testbaseConnString
                             )
-                        
+                        parallel createDbTask1
+                        parallel updateDbTask1
+                        parallel runSmoke1cTask1
 
                     }
                 }
