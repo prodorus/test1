@@ -5,9 +5,9 @@ import ProjectHelpers
 def utils = new Utils()
 def projectHelpers = new ProjectHelpers()
 
-createDbTask1
-updateDbTask1
-runSmoke1cTask1
+def createDbTask1 = [:]
+def updateDbTask1 = [:]
+def runSmoke1cTask1 = [:]
 
 pipeline {
     
@@ -15,7 +15,7 @@ pipeline {
 
     parameters {
         string(defaultValue: "${env.jenkinsAgent}", description: 'Нода дженкинса, на которой запускать пайплайн. По умолчанию master', name: 'jenkinsAgent')
-        string(defaultValue: "нет", description: 'Создать новую базу?(по умолчанию - нет)', name: 'deleteornot')
+        booleanParam(defaultValue: false, description: 'Создать новую базу?(по умолчанию - нет)', name: 'deleteornot')
         string(defaultValue: "${env.path1c}", description: 'Путь к запуску 1с в формате "C:/Program Files (x86)/1cv8t/8.3.20.1613/bin/1cv8t.exe"', name: 'path1c')
         string(defaultValue: "${env.local}", description: 'Путь к информационным базам на компьютере', name: 'local')
         string(defaultValue: "${env.platform1c}", description: 'Версия платформы 1с, например 8.3.12.1685. По умолчанию будет использована последня версия среди установленных', name: 'platform1c')
@@ -47,14 +47,14 @@ pipeline {
                             testbaseConnString ="/F${local}\\${testbase}"
                             
                             // 1.  Создание новой 1с базы
-                            createDbTask1 = createDbTask (
+                            createDbTask1["createTask_${testbase}"] = createDbTask (
                                 testbase,
                                 local,
                                 deleteornot
                             )
 
                             // 2. Обновляем тестовую базу из git
-                            updateDbTask1 = updateDbTask(
+                            updateDbTask1["updateTask_${testbase}"] = updateDbTask(
                                 platform1c,
                                 testbase, 
                                 testbaseConnString, 
@@ -65,7 +65,7 @@ pipeline {
                             )
 
                              // 3. Запускаем внешнюю обработку 1С, которая очищает базу от всплывающего окна с тем, что база перемещена при старте 1С
-                            runSmoke1cTask1 = runSmoke1cTask(
+                            runSmoke1cTask1["runSmoke1cTask_${testbase}"] = runSmoke1cTask(
                                 testbase,
                                 admin1cUser,
                                 admin1cPwd,
