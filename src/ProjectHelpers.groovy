@@ -1,10 +1,10 @@
 
 def creating1cBase(infobase, local, deleteornot) {
-    if ( deleteornot = false){
+    if ( deleteornot == false){
 
     }
     
-    else if (deleteornot = true) {
+    else if (deleteornot == true) {
         utils = new Utils()
 
         utils.powershell("Remove-Item -Recurse -Force -Path \"${local}/${infobase}\" ")
