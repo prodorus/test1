@@ -44,11 +44,7 @@ pipeline {
                             testbase = "${templatebase}"
                             testbaseConnString ="/F${local}\\${testbase}"
                             
-                            class Person{
-                        	    String testbase,
-                                local,
-                                deleteornot
-                            }
+                            
 
                             // 1.  Создание новой 1с базЫ
                             createDbTask (
@@ -116,6 +112,14 @@ pipeline {
     }
 
 }
+
+class Person{
+    String testbase,
+    local,
+    deleteornot
+}
+
+
 
 def createDbTask(infobase, local, deleteornot) {
     return {
