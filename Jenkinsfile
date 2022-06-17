@@ -47,14 +47,14 @@ pipeline {
                             testbaseConnString ="/F${local}\\${testbase}"
                             
                             // 1.  Создание новой 1с базы
-                            createDbTask1["createTask_${testbase}"] = createDbTask (
+                            createDbTask1("createTask_${testbase}") = createDbTask (
                                 testbase,
                                 local,
                                 deleteornot
                             )
 
                             // 2. Обновляем тестовую базу из git
-                            updateDbTask1["updateTask_${testbase}"] = updateDbTask(
+                            updateDbTask1("updateTask_${testbase}") = updateDbTask(
                                 platform1c,
                                 testbase, 
                                 testbaseConnString, 
@@ -65,7 +65,7 @@ pipeline {
                             )
 
                              // 3. Запускаем внешнюю обработку 1С, которая очищает базу от всплывающего окна с тем, что база перемещена при старте 1С
-                            runSmoke1cTask1["runSmoke1cTask_${testbase}"] = runSmoke1cTask(
+                            runSmoke1cTask1("runSmoke1cTask_${testbase}") = runSmoke1cTask(
                                 testbase,
                                 admin1cUser,
                                 admin1cPwd,
