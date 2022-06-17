@@ -14,7 +14,7 @@ pipeline {
     // Входные параметры для запуска сборки
 
     parameters {
-        booleanParam(defaultValue: false, description: 'Создать новую базу 1C?', name: 'deleteornot')
+        booleanParam(defaultValue: "${env.deleteornot}", description: 'Создать новую базу 1C?', name: 'deleteornot')
         string(defaultValue: "${env.jenkinsAgent}", description: 'Нода дженкинса, на которой запускать пайплайн. По умолчанию master', name: 'jenkinsAgent')
         string(defaultValue: "${env.path1c}", description: 'Путь к запуску 1с в формате "C:/Program Files (x86)/1cv8t/8.3.20.1613/bin/1cv8t.exe"', name: 'path1c')
         string(defaultValue: "${env.local}", description: 'Путь к информационным базам на компьютере', name: 'local')
