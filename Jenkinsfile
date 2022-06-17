@@ -5,7 +5,9 @@ import ProjectHelpers
 def utils = new Utils()
 def projectHelpers = new ProjectHelpers()
 
-
+def createDbTask1 = [:]
+def updateDbTask1 = [:]
+def runSmoke1cTask1 = [:]
 
 pipeline {
     
@@ -45,14 +47,14 @@ pipeline {
                             testbaseConnString ="/F${local}\\${testbase}"
                             
                             // 1.  Создание новой 1с базы
-                            def createDbTask1 = createDbTask (
+                            createDbTask1["createTask_${testbase}"] = createDbTask (
                                 testbase,
                                 local,
                                 deleteornot
                             )
 
                             // 2. Обновляем тестовую базу из git
-                            def updateDbTask1 = updateDbTask(
+                            updateDbTask1["updateTask_${testbase}"] = updateDbTask(
                                 platform1c,
                                 testbase, 
                                 testbaseConnString, 
@@ -63,7 +65,7 @@ pipeline {
                             )
 
                              // 3. Запускаем внешнюю обработку 1С, которая очищает базу от всплывающего окна с тем, что база перемещена при старте 1С
-                            def runSmoke1cTask1 = runSmoke1cTask(
+                            runSmoke1cTask1["runSmoke1cTask_${testbase}"] = runSmoke1cTask(
                                 testbase,
                                 admin1cUser,
                                 admin1cPwd,
