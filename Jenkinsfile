@@ -38,7 +38,7 @@ pipeline {
     }
 
     stages {
-        stage("Обновление конфигурации и запуск ИБ 1С") {
+        stage("Сборка") {
             steps {
                 timestamps {
                     script {
@@ -141,13 +141,9 @@ def createDbTask(infobase, local, deleteornot) {
             timestamps {
                 def projectHelpers = new ProjectHelpers()
                 projectHelpers.creating1cBase(infobase,local,deleteornot)
-                
-                     
-
             }
         }
     }
-
 }
 
 
@@ -159,10 +155,7 @@ def updateDbTask(platform1c, infobase, connString, admin1cUser, admin1cPwd, gitp
 
                 prHelpers.loadCfgFrom1CStorage(infobase, admin1cUser, admin1cPwd, platform1c, gitpath, path1c)
                 prHelpers.updateInfobase(connString, admin1cUser, admin1cPwd, platform1c)
-                
-
-
-                
+  
             }
         }
     }
